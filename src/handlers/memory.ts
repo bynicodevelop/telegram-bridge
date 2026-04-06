@@ -93,11 +93,17 @@ async function handleList(ctx: BotContext) {
     return;
   }
 
-  const lines = [`📝 <b>Mémoires</b> (${entries.length} entrées)`, ""];
+  const lines = [`📝 <b>Mémoires</b> (${entries.length})`, ""];
   for (const e of entries) {
     const emoji = e.type === "config" ? "🔧" : "🧠";
-    const tags = e.tags.length > 0 ? ` — ${e.tags.join(", ")}` : "";
-    lines.push(`${emoji} <b>${e.key}</b> [${e.type}]${tags}`);
+    const preview = e.content.length > 80
+      ? escapeHtml(e.content.slice(0, 80)) + "…"
+      : escapeHtml(e.content);
+    const date = new Date(e.updated).toLocaleDateString("fr-FR", {
+      day: "2-digit", month: "short", year: "numeric",
+    });
+    lines.push(`${emoji} <b>${e.key}</b> — <code>${preview}</code>`);
+    lines.push(`    <i>${date}</i>`);
   }
 
   await ctx.reply(lines.join("\n"), { parse_mode: "HTML" });
