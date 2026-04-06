@@ -34,6 +34,15 @@ src/
     botmanager.ts       # Status, coûts, santé, kill, reload
     skill.ts            # Callbacks inline pour sélection de skills
     freetext.ts         # Routage texte libre vers projet actif
+    memory.ts           # Gestion mémoire globale (/memory)
+    cron.ts             # Gestion tâches planifiées (/cron)
+  memory/
+    store.ts            # CRUD fichiers markdown mémoire
+  cron/
+    types.ts            # Interface CronJob
+    parser.ts           # Parseur expressions cron 5 champs
+    store.ts            # CRUD jobs.json
+    scheduler.ts        # Boucle d'exécution (tick 60s)
   middleware/
     auth.ts             # Vérification owner ID (drop silencieux)
     logging.ts          # Log JSON des événements
@@ -52,6 +61,8 @@ src/
 - **Exécution Claude**: subprocess avec `--output-format json` et `--dangerously-skip-permissions`
 - **Suivi des coûts**: map en mémoire par projet, persisté dans les changelogs
 - **Messages Telegram**: split automatique à 4096 caractères, conversion Markdown -> HTML
+- **Mémoire globale**: fichiers markdown dans `.provider/memory/`, injectés dans chaque prompt Claude via balises `<memory>`
+- **Cron**: jobs persistés dans `.provider/cron/jobs.json`, scheduler tick 60s, création via langage naturel (Claude écrit le fichier)
 
 ## Variables d'environnement
 
@@ -59,6 +70,7 @@ src/
 - `TELEGRAM_OWNER_ID` (requis)
 - `CLAUDE_PATH` (optionnel, défaut: "claude")
 - `CLAUDE_TIMEOUT_MS` (optionnel, défaut: 300000)
+- `MEMORY_DIR` (optionnel, défaut: `{projectsDir}/.provider/memory`)
 
 ## Conventions
 

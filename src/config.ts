@@ -16,4 +16,5 @@ export const config = {
   claudeTimeoutMs: Number(process.env.CLAUDE_TIMEOUT_MS) || 300_000,
   projectsDir,
   memoryDir: process.env.MEMORY_DIR || join(projectsDir, ".provider", "memory"),
+  cronDir: join(projectsDir, ".provider", "cron"),
 };

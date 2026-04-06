@@ -6,6 +6,7 @@ import { handleBotManager } from "./handlers/botmanager.js";
 import { handleSkillCallback } from "./handlers/skill.js";
 import { handleFreeText } from "./handlers/freetext.js";
 import { handleMemory } from "./handlers/memory.js";
+import { handleCron } from "./handlers/cron.js";
 
 export function registerRoutes(bot: Bot<BotContext>) {
   // Project commands
@@ -18,6 +19,9 @@ export function registerRoutes(bot: Bot<BotContext>) {
 
   // Memory
   bot.command("memory", handleMemory);
+
+  // Cron
+  bot.command("cron", handleCron);
 
   // Start & help
   bot.command("start", async (ctx) => {
@@ -38,6 +42,9 @@ export function registerRoutes(bot: Bot<BotContext>) {
       "<b>Mémoire :</b>",
       "  /memory \u2014 \uD83D\uDCDD Mémoire globale",
       "",
+      "<b>Cron :</b>",
+      "  /cron \u2014 \u23F0 Tâches planifiées",
+      "",
       "Tape une commande projet pour voir les skills disponibles.",
     ];
     await ctx.reply(lines.join("\n"), { parse_mode: "HTML" });
@@ -54,6 +61,9 @@ export function registerRoutes(bot: Bot<BotContext>) {
       "<code>/bm status|cost|health|kill</code> \u2014 Gestion bot",
       "",
       "<code>/memory list|get|add|delete|search</code> \u2014 Mémoire globale",
+      "",
+      "<code>/cron list|delete|run</code> \u2014 Tâches planifiées",
+      "<code>/cron [demande en texte libre]</code> \u2014 Gérer via Claude",
       "",
       "Apr\u00E8s avoir s\u00E9lectionn\u00E9 un projet, tes messages libres y sont envoy\u00E9s automatiquement.",
     ];
@@ -73,6 +83,7 @@ export function registerRoutes(bot: Bot<BotContext>) {
     { command: "vl", description: "\u{1F3DB}\uFE0F Vision Lib\u00e9rale" },
     { command: "bm", description: "\u{2699}\uFE0F Bot Manager" },
     { command: "memory", description: "\uD83D\uDCDD Mémoire globale" },
+    { command: "cron", description: "\u23F0 Tâches planifiées" },
     { command: "help", description: "\u{2753} Aide" },
   ]);
 }

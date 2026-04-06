@@ -1,6 +1,7 @@
 import { createBot } from "./bot.js";
 import { registerRoutes } from "./router.js";
 import { getProjects } from "./projects/registry.js";
+import { startScheduler, stopScheduler } from "./cron/scheduler.js";
 
 async function main() {
   console.log("Starting Telegram Bridge...");
@@ -17,6 +18,7 @@ async function main() {
   // Graceful shutdown
   const shutdown = () => {
     console.log("Shutting down...");
+    stopScheduler();
     bot.stop();
     process.exit(0);
   };
@@ -25,6 +27,7 @@ async function main() {
 
   console.log("Bot started. Listening for messages...");
   bot.start();
+  startScheduler(bot);
 }
 
 main().catch((err) => {
