@@ -53,11 +53,43 @@ src/
     formatter.ts        # Conversion Markdown -> HTML Telegram, split messages
 ```
 
+## Skills centralisés
+
+telegram-bridge héberge les **skills partagés** utilisés par tous les projets. Chaque projet les consomme via des symlinks depuis `.claude/commands/` vers `telegram-bridge/.claude/commands/`.
+
+| Skill | Rôle |
+|-------|------|
+| `provider.md` | Orchestrateur générique — charge `.provider/` pour le contexte projet |
+| `write-article.md` | Rédacteur SEO générique — templates et scoring depuis `identity.md` |
+| `research.md` | Recherche documentaire — sources depuis `sources.md` |
+| `seo-strategy.md` | Stratège SEO — clusters et keywords |
+| `editorial-plan.md` | Planificateur éditorial — calendrier et suivi |
+| `generate-image.md` | Générateur d'images — charte depuis `charte.md` |
+| `cron.md` | Scheduler de crons — planning depuis `config.md` |
+
+### Architecture "Convention over Configuration"
+
+Chaque projet DOIT avoir ces fichiers dans `.provider/` :
+
+| Fichier | Contenu |
+|---------|---------|
+| `identity.md` | Doctrine, ton, langue, conformité, types de contenu, scoring, templates |
+| `sources.md` | Sources de recherche prioritaires, méthodologie, axes spécifiques |
+| `charte.md` | Identité visuelle, palette, préfixe prompt image, formats |
+| `config.md` | Structure technique, volumes, crons, sub-skills, publication |
+| `memory.md` | Décisions stratégiques validées |
+| `editorial.md` | Calendrier éditorial avec statuts |
+| `keywords.md` | Mots-clés, clusters, priorités |
+
+Les 4 premiers sont **obligatoires** et contiennent toute la spécificité du projet. Les skills centralisés lisent ces fichiers en Step 0 pour s'adapter au contexte.
+
 ## Concepts clés
 
 - **Session grammy**: stocke le projet actif et l'état d'attente d'arguments skill
 - **Queue par projet**: mutex empêchant les exécutions Claude concurrentes sur un même projet
-- **Découverte de skills**: scan dynamique des fichiers `.md` dans `.claude/commands/` de chaque projet
+- **Découverte de skills**: scan dynamique des fichiers `.md` dans `.claude/commands/` de chaque projet (symlinks + fichiers réels)
+- **Skills centralisés**: 7 skills génériques dans `telegram-bridge/.claude/commands/`, symlinkés dans chaque projet
+- **Skills spécifiques**: fichiers réels dans chaque projet pour les skills sans équivalent ailleurs
 - **Exécution Claude**: subprocess avec `--output-format json` et `--dangerously-skip-permissions`
 - **Suivi des coûts**: map en mémoire par projet, persisté dans les changelogs
 - **Messages Telegram**: split automatique à 4096 caractères, conversion Markdown -> HTML
