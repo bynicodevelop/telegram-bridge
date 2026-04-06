@@ -4,6 +4,7 @@ import { loadJobs, deleteJob, getJob, saveJobs } from "../cron/store.js";
 import { computeNextRun } from "../cron/parser.js";
 import { getProjects, getProject } from "../projects/registry.js";
 import { executeAndReply } from "./project.js";
+import { syncAllFromConfigs } from "../cron/sync.js";
 
 export async function handleCron(ctx: BotContext) {
   const text = ctx.message?.text?.replace(/^\/cron\s*/, "").trim() || "";
@@ -19,10 +20,13 @@ export async function handleCron(ctx: BotContext) {
     case "run":
       await handleRun(ctx, args[0]);
       return;
+    case "help":
+      await handleHelp(ctx);
+      return;
   }
 
   if (!text) {
-    await handleHelp(ctx);
+    await handleSyncAll(ctx);
     return;
   }
 
@@ -161,6 +165,56 @@ ${text}`;
   await executeAndReply(ctx, "cron", "Cron", "⏰", config.projectsDir, systemPrompt);
 }
 
+async function handleSyncAll(ctx: BotContext) {
+  try {
+    const result = await syncAllFromConfigs();
+    const projects = await getProjects();
+    const lines: string[] = [];
+
+    if (result.created.length > 0) {
+      lines.push("⏰ <b>Crons synchronisés</b>\n");
+
+      for (const project of projects) {
+        const projectJobs = result.created.filter(
+          (j) => j.projectId === project.id,
+        );
+        if (projectJobs.length === 0) continue;
+
+        lines.push(
+          `${project.emoji} <b>${project.name}</b> — ${projectJobs.length} créé(s)`,
+        );
+        for (const job of projectJobs) {
+          lines.push(`  <code>${job.schedule}</code> ${job.title}`);
+        }
+        lines.push("");
+      }
+
+      const skippedCount = result.skipped.filter(
+        (s) => s.reason === "déjà existant",
+      ).length;
+      if (skippedCount > 0) {
+        lines.push(`⏭️ ${skippedCount} cron(s) ignoré(s) (déjà en place)`);
+      }
+    } else {
+      lines.push("⏰ <b>Crons synchronisés</b>\n");
+      lines.push("Aucun nouveau cron à créer.");
+    }
+
+    lines.push("");
+    lines.push(`✅ <b>${result.total}</b> cron(s) actif(s) au total`);
+    lines.push("");
+    lines.push(
+      "<code>/cron list</code> — Détail | <code>/cron help</code> — Aide",
+    );
+
+    await ctx.reply(lines.join("\n"), { parse_mode: "HTML" });
+  } catch (err) {
+    await ctx.reply(
+      `❌ Erreur lors de la synchronisation : ${(err as Error).message}`,
+    );
+  }
+}
+
 async function handleHelp(ctx: BotContext) {
   const jobs = await loadJobs();
   const countLine = jobs.length > 0
@@ -171,9 +225,11 @@ async function handleHelp(ctx: BotContext) {
     "⏰ <b>Cron — Tâches planifiées</b>",
     countLine,
     "<b>Commandes :</b>",
+    "<code>/cron</code> — Synchroniser tous les crons depuis les configs",
     "<code>/cron list</code> — Lister les jobs",
     "<code>/cron delete &lt;id&gt;</code> — Supprimer un job",
     "<code>/cron run &lt;id&gt;</code> — Exécuter manuellement",
+    "<code>/cron help</code> — Afficher cette aide",
     "",
     "<b>Langage naturel :</b>",
     "<code>/cron [ta demande]</code> — Claude crée/modifie les jobs",

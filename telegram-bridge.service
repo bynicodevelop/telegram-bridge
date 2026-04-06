@@ -1,0 +1,32 @@
+[Unit]
+Description=Telegram Bridge — Claude CLI bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=debian
+WorkingDirectory=/home/debian/telegram-bridge
+ExecStart=/usr/bin/node dist/index.js
+Restart=always
+RestartSec=5
+
+# Env file with secrets
+EnvironmentFile=/home/debian/telegram-bridge/.env
+
+# Graceful shutdown (bot handles SIGTERM)
+KillSignal=SIGTERM
+TimeoutStopSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=telegram-bridge
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/home/debian /tmp
+
+[Install]
+WantedBy=multi-user.target

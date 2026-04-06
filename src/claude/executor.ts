@@ -66,8 +66,15 @@ export async function executeClaude(projectId: string, opts: ClaudeExecOptions):
       clearTimeout(timer);
       runningProcesses.delete(projectId);
 
+      if (stderr) {
+        console.error(`[claude:${projectId}] stderr: ${stderr.slice(0, 500)}`);
+      }
+
       try {
         const json = JSON.parse(stdout);
+        if (json.is_error) {
+          console.error(`[claude:${projectId}] is_error=true, result=${JSON.stringify(json.result?.slice(0, 200))}, errors=${JSON.stringify(json.errors)}`);
+        }
         resolve({
           success: !json.is_error,
           result: json.result || "",
@@ -79,6 +86,7 @@ export async function executeClaude(projectId: string, opts: ClaudeExecOptions):
         });
       } catch {
         // JSON parse failed — return raw output
+        console.error(`[claude:${projectId}] JSON parse failed, code=${code}, stdout=${stdout.slice(0, 300)}, stderr=${stderr.slice(0, 300)}`);
         resolve({
           success: code === 0,
           result: stdout || stderr || `Process exited with code ${code}`,
