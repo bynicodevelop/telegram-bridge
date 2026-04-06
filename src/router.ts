@@ -5,6 +5,7 @@ import { handleProjectCommand } from "./handlers/project.js";
 import { handleBotManager } from "./handlers/botmanager.js";
 import { handleSkillCallback } from "./handlers/skill.js";
 import { handleFreeText } from "./handlers/freetext.js";
+import { handleMemory } from "./handlers/memory.js";
 
 export function registerRoutes(bot: Bot<BotContext>) {
   // Project commands
@@ -14,6 +15,9 @@ export function registerRoutes(bot: Bot<BotContext>) {
 
   // Bot manager
   bot.command("bm", handleBotManager);
+
+  // Memory
+  bot.command("memory", handleMemory);
 
   // Start & help
   bot.command("start", async (ctx) => {
@@ -31,6 +35,9 @@ export function registerRoutes(bot: Bot<BotContext>) {
       "  /bm cost \u2014 Suivi des co\u00FBts",
       "  /bm health \u2014 Sant\u00E9 du syst\u00E8me",
       "",
+      "<b>Mémoire :</b>",
+      "  /memory \u2014 \uD83D\uDCDD Mémoire globale",
+      "",
       "Tape une commande projet pour voir les skills disponibles.",
     ];
     await ctx.reply(lines.join("\n"), { parse_mode: "HTML" });
@@ -45,6 +52,8 @@ export function registerRoutes(bot: Bot<BotContext>) {
       "<code>/nexpips question libre</code> \u2014 Envoie \u00E0 Claude",
       "",
       "<code>/bm status|cost|health|kill</code> \u2014 Gestion bot",
+      "",
+      "<code>/memory list|get|add|delete|search</code> \u2014 Mémoire globale",
       "",
       "Apr\u00E8s avoir s\u00E9lectionn\u00E9 un projet, tes messages libres y sont envoy\u00E9s automatiquement.",
     ];
@@ -63,6 +72,7 @@ export function registerRoutes(bot: Bot<BotContext>) {
     { command: "prompticon", description: "\u{1F916} Prompticon" },
     { command: "vl", description: "\u{1F3DB}\uFE0F Vision Lib\u00e9rale" },
     { command: "bm", description: "\u{2699}\uFE0F Bot Manager" },
+    { command: "memory", description: "\uD83D\uDCDD Mémoire globale" },
     { command: "help", description: "\u{2753} Aide" },
   ]);
 }

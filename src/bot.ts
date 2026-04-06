@@ -7,6 +7,7 @@ export interface SessionData {
   activeProject: string | null;
   awaitingArgsForSkill: string | null;
   awaitingArgsForProject: string | null;
+  awaitingMemoryContent: { key: string; type?: "config" | "behavior" } | null;
 }
 
 export type BotContext = Context & SessionFlavor<SessionData>;
@@ -19,6 +20,7 @@ export function createBot(): Bot<BotContext> {
       activeProject: "bm",
       awaitingArgsForSkill: null,
       awaitingArgsForProject: null,
+      awaitingMemoryContent: null,
     }),
   }));
 

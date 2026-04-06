@@ -1,11 +1,20 @@
 import { type BotContext } from "../bot.js";
 import { getProject } from "../projects/registry.js";
 import { executeAndReply } from "./project.js";
+import { addMemoryFromFreeText } from "./memory.js";
 import { config } from "../config.js";
 
 export async function handleFreeText(ctx: BotContext) {
   const text = ctx.message?.text?.trim();
   if (!text) return;
+
+  // If awaiting memory content
+  if (ctx.session.awaitingMemoryContent) {
+    const { key, type } = ctx.session.awaitingMemoryContent;
+    ctx.session.awaitingMemoryContent = null;
+    await addMemoryFromFreeText(ctx, key, text, type);
+    return;
+  }
 
   // If awaiting skill arguments
   if (ctx.session.awaitingArgsForSkill && ctx.session.awaitingArgsForProject) {

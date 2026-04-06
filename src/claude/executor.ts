@@ -1,10 +1,12 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { config } from "../config.js";
+import { buildMemoryPrompt } from "../memory/store.js";
 
 export interface ClaudeExecOptions {
   prompt: string;
   cwd: string;
   timeoutMs?: number;
+  injectMemory?: boolean;
 }
 
 export interface ClaudeExecResult {
@@ -29,8 +31,17 @@ export async function executeClaude(projectId: string, opts: ClaudeExecOptions):
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), timeout);
 
+  // Inject memory context into prompt
+  let finalPrompt = opts.prompt;
+  if (opts.injectMemory !== false) {
+    const memBlock = await buildMemoryPrompt();
+    if (memBlock) {
+      finalPrompt = `<memory>\n${memBlock}\n</memory>\n\n${finalPrompt}`;
+    }
+  }
+
   const args = [
-    "-p", opts.prompt,
+    "-p", finalPrompt,
     "--output-format", "json",
     "--dangerously-skip-permissions",
   ];
