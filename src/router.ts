@@ -76,14 +76,15 @@ export function registerRoutes(bot: Bot<BotContext>) {
   // Free text (routed to active project)
   bot.on("message:text", handleFreeText);
 
-  // Register commands with BotFather
+  // Register commands with BotFather (non-blocking — rate-limit must not crash the bot)
   bot.api.setMyCommands([
     { command: "nexpips", description: "\u{1F4C8} NexPips" },
     { command: "prompticon", description: "\u{1F916} Prompticon" },
     { command: "vl", description: "\u{1F3DB}\uFE0F Vision Lib\u00e9rale" },
+    { command: "bot_trading", description: "\u{1F916} Bot Trading" },
     { command: "bm", description: "\u{2699}\uFE0F Bot Manager" },
     { command: "memory", description: "\uD83D\uDCDD Mémoire globale" },
     { command: "cron", description: "\u23F0 Tâches planifiées" },
     { command: "help", description: "\u{2753} Aide" },
-  ]);
+  ]).catch((err) => console.warn("⚠️ setMyCommands failed (non-fatal):", err.message));
 }

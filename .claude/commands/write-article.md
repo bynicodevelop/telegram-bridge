@@ -160,6 +160,7 @@ node scripts/generate-image.js --prompt "..." --output "[chemin depuis charte.md
 - Le prompt DOIT commencer par le préfixe défini dans `charte.md`
 - Boucle d'auto-critique : analyser l'image, ajuster le prompt si besoin (max 3 tentatives)
 - Référencer dans le frontmatter du contenu (format selon config.md)
+- NE PAS répéter l'image hero dans le corps markdown — elle est rendue par le layout depuis le frontmatter `image`
 
 #### 6b. Images inline (pédagogiques)
 
@@ -191,7 +192,7 @@ Utiliser le mapping type → répertoire défini dans `config.md` pour placer le
 | Emplacement | Obligatoire | Détail |
 |---|---|---|
 | Title tag (champ `title`) | Oui | Le plus près possible du début. 50-60 caractères max |
-| H1 | Oui | Identique ou très proche du title |
+| H1 (via frontmatter `title`) | Oui | Rendu automatiquement par le layout Astro — NE PAS répéter de `# titre` dans le corps markdown |
 | URL / slug | Oui | Court, 3-5 mots, avec le mot-clé. Sans accents, minuscules, tirets |
 | Meta description | Oui | Google met en gras les termes qui correspondent à la requête |
 | Premier paragraphe | Oui | Dans les 100-150 premiers mots |
