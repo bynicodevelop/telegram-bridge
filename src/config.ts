@@ -17,4 +17,5 @@ export const config = {
   projectsDir,
   memoryDir: process.env.MEMORY_DIR || join(projectsDir, ".provider", "memory"),
   cronDir: join(projectsDir, ".provider", "cron"),
+  linkcheckDir: join(projectsDir, ".provider", "linkcheck"),
 };

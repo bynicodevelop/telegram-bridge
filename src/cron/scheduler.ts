@@ -9,6 +9,7 @@ import { getProject } from "../projects/registry.js";
 import { trackCost } from "../handlers/botmanager.js";
 import { logExecution } from "../changelog.js";
 import { markdownToHtml, splitMessage, formatCostFooter } from "../ui/formatter.js";
+import { maybeRunLinkCheck } from "../linkcheck/index.js";
 
 let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -39,6 +40,7 @@ export function stopScheduler() {
 
 function scheduleTick(bot: Bot<BotContext>) {
   tick(bot).finally(() => {
+    maybeRunLinkCheck(bot).catch((err) => console.error("🔗 LinkCheck error:", err));
     timer = setTimeout(() => scheduleTick(bot), 60_000);
   });
 }
@@ -85,7 +87,7 @@ async function tick(bot: Bot<BotContext>) {
             const result = await executeClaude(job.projectId, {
               prompt: cronPrompt,
               cwd: project.path,
-              timeoutMs: 900_000, // 15 min — crons do research + write + image + git
+              timeoutMs: 1_800_000, // 30 min — crons do research + write + image + git
             });
 
             const elapsed = Math.round((Date.now() - startTime) / 1000);

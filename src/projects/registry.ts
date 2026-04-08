@@ -14,13 +14,15 @@ export interface ProjectConfig {
   name: string;
   path: string;
   emoji: string;
+  siteUrl?: string;
   skills: SkillDef[];
 }
 
 const PROJECT_DEFS: Omit<ProjectConfig, "skills">[] = [
-  { id: "nexpips", prefix: "nexpips", name: "NexPips", path: join(config.projectsDir, "com.nexpips"), emoji: "\u{1F4C8}" },
-  { id: "prompticon", prefix: "prompticon", name: "Prompticon", path: join(config.projectsDir, "io.prompticon"), emoji: "\u{1F916}" },
-  { id: "vl", prefix: "vl", name: "Vision Lib\u00e9rale", path: join(config.projectsDir, "vision-liberale"), emoji: "\u{1F3DB}\uFE0F" },
+  { id: "nexpips", prefix: "nexpips", name: "NexPips", path: join(config.projectsDir, "com.nexpips"), emoji: "\u{1F4C8}", siteUrl: "https://nexpips.com" },
+  { id: "prompticon", prefix: "prompticon", name: "Prompticon", path: join(config.projectsDir, "io.prompticon"), emoji: "\u{1F916}", siteUrl: "https://prompticon.io" },
+  { id: "vl", prefix: "vl", name: "Vision Lib\u00e9rale", path: join(config.projectsDir, "vision-liberale"), emoji: "\u{1F3DB}\uFE0F", siteUrl: "https://visionliberale.com" },
+  { id: "bot-trading", prefix: "bt", name: "Bot Trading", path: join(config.projectsDir, "fr.bot-trading"), emoji: "\u{1F916}", siteUrl: "https://bot-trading.fr" },
 ];
 
 async function scanSkills(projectPath: string): Promise<SkillDef[]> {

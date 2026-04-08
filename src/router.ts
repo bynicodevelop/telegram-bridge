@@ -7,8 +7,13 @@ import { handleSkillCallback } from "./handlers/skill.js";
 import { handleFreeText } from "./handlers/freetext.js";
 import { handleMemory } from "./handlers/memory.js";
 import { handleCron } from "./handlers/cron.js";
+import { handleLinkCheck, initLinkCheckHandler } from "./handlers/linkcheck.js";
 
 export function registerRoutes(bot: Bot<BotContext>) {
+  // Link checker
+  initLinkCheckHandler(bot);
+  bot.command("linkcheck", handleLinkCheck);
+
   // Project commands
   bot.command("nexpips", (ctx) => handleProjectCommand(ctx, "nexpips"));
   bot.command("prompticon", (ctx) => handleProjectCommand(ctx, "prompticon"));
@@ -44,6 +49,9 @@ export function registerRoutes(bot: Bot<BotContext>) {
       "",
       "<b>Cron :</b>",
       "  /cron \u2014 \u23F0 Tâches planifiées",
+      "",
+      "<b>Liens :</b>",
+      "  /linkcheck \u2014 \u{1F517} Vérifier les liens morts",
       "",
       "Tape une commande projet pour voir les skills disponibles.",
     ];
@@ -85,6 +93,7 @@ export function registerRoutes(bot: Bot<BotContext>) {
     { command: "bm", description: "\u{2699}\uFE0F Bot Manager" },
     { command: "memory", description: "\uD83D\uDCDD Mémoire globale" },
     { command: "cron", description: "\u23F0 Tâches planifiées" },
+    { command: "linkcheck", description: "\u{1F517} Vérifier les liens morts" },
     { command: "help", description: "\u{2753} Aide" },
   ]).catch((err) => console.warn("⚠️ setMyCommands failed (non-fatal):", err.message));
 }
