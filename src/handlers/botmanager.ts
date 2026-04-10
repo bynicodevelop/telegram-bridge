@@ -62,7 +62,7 @@ export async function handleBotManager(ctx: BotContext) {
       [
         "\u{2699}\uFE0F <b>Bot Manager</b> \u2014 Mode interactif",
         "",
-        "Envoie un message et il sera ex\u00E9cut\u00E9 via Claude CLI dans le contexte global (<code>/home/debian/projects/</code>).",
+        `Envoie un message et il sera ex\u00E9cut\u00E9 via Claude CLI dans le contexte global (<code>${config.projectsDir}</code>).`,
         "",
         "<b>Commandes rapides :</b>",
         "<code>/bm status</code> \u2014 \u00C9tat des queues",
@@ -159,7 +159,9 @@ async function handleHealth(ctx: BotContext) {
 
 async function handleKill(ctx: BotContext, projectId?: string) {
   if (!projectId) {
-    await ctx.reply("Usage: <code>/bm kill [nexpips|prompticon|vl]</code>", { parse_mode: "HTML" });
+    const projects = await getProjects();
+    const ids = projects.map((p) => p.id).join("|");
+    await ctx.reply(`Usage: <code>/bm kill [${ids}]</code>`, { parse_mode: "HTML" });
     return;
   }
 

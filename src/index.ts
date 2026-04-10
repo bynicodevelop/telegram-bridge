@@ -13,7 +13,7 @@ async function startBot() {
   }
 
   const bot = createBot();
-  registerRoutes(bot);
+  await registerRoutes(bot);
 
   // Graceful shutdown
   const shutdown = () => {

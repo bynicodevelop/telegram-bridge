@@ -6,7 +6,8 @@ import { z } from "zod";
 
 // --- Shared quota tracker (200/day across all projects on same GCP project) ---
 
-const GSC_QUOTA_FILE = "/home/debian/projects/.provider/gsc-quota.json";
+const defaultProjectsDir = `${process.env.HOME || "/home/debian"}/projects`;
+const GSC_QUOTA_FILE = process.env.GSC_QUOTA_FILE || `${process.env.PROJECTS_DIR || defaultProjectsDir}/.provider/gsc-quota.json`;
 const GSC_DAILY_LIMIT = 190; // safety margin on Google's 200/day
 
 function checkAndIncrementQuota() {

@@ -102,7 +102,20 @@ Les 4 premiers sont **obligatoires** et contiennent toute la spécificité du pr
 - `TELEGRAM_OWNER_ID` (requis)
 - `CLAUDE_PATH` (optionnel, défaut: "claude")
 - `CLAUDE_TIMEOUT_MS` (optionnel, défaut: 300000)
-- `MEMORY_DIR` (optionnel, défaut: `{projectsDir}/.provider/memory`)
+- `PROJECTS_DIR` (optionnel, défaut: `~/projects`)
+- `BRIDGE_DIR` (optionnel, défaut: `process.cwd()`)
+- `PROJECTS_CONFIG` (optionnel, défaut: `$BRIDGE_DIR/projects.json`)
+- `MEMORY_DIR` (optionnel, défaut: `$PROJECTS_DIR/.provider/memory`)
+
+## Configuration des projets
+
+Les projets sont définis dans `projects.json` (non tracké par git). Voir `projects.json.example` pour le format attendu. Chaque entrée :
+
+```json
+{ "id": "my-project", "prefix": "myproj", "name": "My Project", "dir": "com.my-project", "emoji": "...", "siteUrl": "https://..." }
+```
+
+Les commandes Telegram (`/myproj`) et les entrées BotFather sont générées automatiquement depuis ce fichier.
 
 ## Conventions
 

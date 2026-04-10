@@ -5,14 +5,14 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=debian
-WorkingDirectory=/home/debian/telegram-bridge
+User=__USER__
+WorkingDirectory=__BRIDGE_DIR__
 ExecStart=/usr/bin/node dist/index.js
 Restart=always
 RestartSec=5
 
 # Env file with secrets
-EnvironmentFile=/home/debian/telegram-bridge/.env
+EnvironmentFile=__BRIDGE_DIR__/.env
 
 # Graceful shutdown (bot handles SIGTERM)
 KillSignal=SIGTERM
@@ -26,7 +26,7 @@ SyslogIdentifier=telegram-bridge
 # Security hardening
 NoNewPrivileges=true
 ProtectSystem=strict
-ReadWritePaths=/home/debian /tmp
+ReadWritePaths=__HOME_DIR__ /tmp
 
 [Install]
 WantedBy=multi-user.target

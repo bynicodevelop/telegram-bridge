@@ -2,3 +2,5 @@ node_modules/
 dist/
 .env
 *.log
+projects.json
+telegram-bridge.service

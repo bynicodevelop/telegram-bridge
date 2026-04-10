@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { config } from "../config.js";
@@ -18,12 +19,26 @@ export interface ProjectConfig {
   skills: SkillDef[];
 }
 
-const PROJECT_DEFS: Omit<ProjectConfig, "skills">[] = [
-  { id: "nexpips", prefix: "nexpips", name: "NexPips", path: join(config.projectsDir, "com.nexpips"), emoji: "\u{1F4C8}", siteUrl: "https://nexpips.com" },
-  { id: "prompticon", prefix: "prompticon", name: "Prompticon", path: join(config.projectsDir, "io.prompticon"), emoji: "\u{1F916}", siteUrl: "https://prompticon.io" },
-  { id: "vl", prefix: "vl", name: "Vision Lib\u00e9rale", path: join(config.projectsDir, "vision-liberale"), emoji: "\u{1F3DB}\uFE0F", siteUrl: "https://visionliberale.com" },
-  { id: "bot-trading", prefix: "bt", name: "Bot Trading", path: join(config.projectsDir, "fr.bot-trading"), emoji: "\u{1F916}", siteUrl: "https://bot-trading.fr" },
-];
+interface ProjectDef {
+  id: string;
+  prefix: string;
+  name: string;
+  dir: string;
+  emoji: string;
+  siteUrl?: string;
+}
+
+function loadProjectDefs(): Omit<ProjectConfig, "skills">[] {
+  const raw = JSON.parse(readFileSync(config.projectsConfigPath, "utf-8")) as ProjectDef[];
+  return raw.map((p) => ({
+    id: p.id,
+    prefix: p.prefix,
+    name: p.name,
+    path: join(config.projectsDir, p.dir),
+    emoji: p.emoji,
+    siteUrl: p.siteUrl,
+  }));
+}
 
 async function scanSkills(projectPath: string): Promise<SkillDef[]> {
   const commandsDir = join(projectPath, ".claude", "commands");
@@ -62,8 +77,9 @@ let _projects: ProjectConfig[] | null = null;
 
 export async function getProjects(): Promise<ProjectConfig[]> {
   if (_projects) return _projects;
+  const defs = loadProjectDefs();
   _projects = await Promise.all(
-    PROJECT_DEFS.map(async (def) => ({
+    defs.map(async (def) => ({
       ...def,
       skills: await scanSkills(def.path),
     }))

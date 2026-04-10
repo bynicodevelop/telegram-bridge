@@ -32,7 +32,7 @@ export async function handleLinkCheck(ctx: BotContext) {
         "🔗 <b>Link Checker</b>",
         "",
         "<code>/linkcheck</code> — Scanner tous les sites",
-        "<code>/linkcheck [projet]</code> — Scanner un site (nexpips, prompticon, vl, bot-trading)",
+        "<code>/linkcheck [projet]</code> — Scanner un site par ID",
         "<code>/linkcheck status</code> — Dernier rapport",
         "<code>/linkcheck help</code> — Cette aide",
       ].join("\n"),

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "my-project",
+    "prefix": "myproj",
+    "name": "My Project",
+    "dir": "com.my-project",
+    "emoji": "\ud83d\udcdd",
+    "siteUrl": "https://my-project.com"
+  }
+]

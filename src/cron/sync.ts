@@ -47,20 +47,20 @@ function extractCronExpression(block: string): string | null {
 }
 
 function extractPrompt(block: string): string | null {
-  // Format 1: NexPips — **Prompt** : (possibly multi-line)
+  // Format 1: **Prompt** : (possibly multi-line)
   const promptMatch = block.match(/\*\*Prompt\*\*\s*:\s*([\s\S]+?)$/);
   if (promptMatch) {
     return promptMatch[1].trim();
   }
 
-  // Format 2: VL — code block with skill: + context:
+  // Format 2: code block with skill: + context:
   const skillMatch = block.match(/skill:\s*(\S+)/);
   const contextMatch = block.match(/context:\s*"(.+?)"/s);
   if (skillMatch && contextMatch) {
     return `Execute ${skillMatch[1]}. ${contextMatch[1]}`;
   }
 
-  // Format 3: Prompticon — **Action**: + **Output**:
+  // Format 3: **Action**: + **Output**:
   const actionMatch = block.match(/\*\*Action\*\*\s*:\s*(.+)/);
   if (actionMatch) {
     let prompt = actionMatch[1].trim();

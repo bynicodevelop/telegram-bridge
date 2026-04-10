@@ -1,5 +1,5 @@
 import { type BotContext } from "../bot.js";
-import { getProject } from "../projects/registry.js";
+import { getProject, getProjects } from "../projects/registry.js";
 import { executeAndReply } from "./project.js";
 import { addMemoryFromFreeText } from "./memory.js";
 import { config } from "../config.js";
@@ -40,7 +40,9 @@ export async function handleFreeText(ctx: BotContext) {
     const project = await getProject(ctx.session.activeProject);
     if (!project) {
       ctx.session.activeProject = null;
-      await ctx.reply("Projet actif invalide. Utilise /nexpips, /prompticon ou /vl.");
+      const projects = await getProjects();
+      const prefixList = projects.map((p) => `/${p.prefix}`).join(" \u2014 ");
+      await ctx.reply(`Projet actif invalide. Utilise ${prefixList}.`);
       return;
     }
 
@@ -49,7 +51,9 @@ export async function handleFreeText(ctx: BotContext) {
   }
 
   // No active project
+  const projects = await getProjects();
+  const prefixList = projects.map((p) => `/${p.prefix}`).join(" \u2014 ");
   await ctx.reply(
-    "Aucun projet actif. Utilise une commande projet d'abord :\n/nexpips \u2014 /prompticon \u2014 /vl \u2014 /bm"
+    `Aucun projet actif. Utilise une commande projet d'abord :\n${prefixList} \u2014 /bm`
   );
 }
