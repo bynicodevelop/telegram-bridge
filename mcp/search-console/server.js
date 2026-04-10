@@ -1,7 +1,31 @@
+import { readFileSync, writeFileSync } from "fs";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { google } from "googleapis";
 import { z } from "zod";
+
+// --- Shared quota tracker (200/day across all projects on same GCP project) ---
+
+const GSC_QUOTA_FILE = "/home/debian/projects/.provider/gsc-quota.json";
+const GSC_DAILY_LIMIT = 190; // safety margin on Google's 200/day
+
+function checkAndIncrementQuota() {
+  const today = new Date().toISOString().slice(0, 10);
+  let data = { date: today, count: 0 };
+
+  try {
+    data = JSON.parse(readFileSync(GSC_QUOTA_FILE, "utf-8"));
+    if (data.date !== today) data = { date: today, count: 0 };
+  } catch { /* file missing or corrupt — start fresh */ }
+
+  if (data.count >= GSC_DAILY_LIMIT) {
+    return { allowed: false, remaining: 0, used: data.count };
+  }
+
+  data.count++;
+  writeFileSync(GSC_QUOTA_FILE, JSON.stringify(data), "utf-8");
+  return { allowed: true, remaining: GSC_DAILY_LIMIT - data.count, used: data.count };
+}
 
 // --- Google OAuth2 client (shared across all sites) ---
 
@@ -215,6 +239,18 @@ server.tool(
     url: z.string().url().describe("L'URL a soumettre au crawl Google"),
   },
   async ({ url }) => {
+    const quota = checkAndIncrementQuota();
+    if (!quota.allowed) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `QUOTA EPUISE : ${quota.used}/${GSC_DAILY_LIMIT} requetes utilisees aujourd'hui. URL NON soumise : ${url}`,
+          },
+        ],
+      };
+    }
+
     const indexing = google.indexing({ version: "v3", auth: oauth2Client });
 
     await indexing.urlNotifications.publish({
@@ -228,7 +264,7 @@ server.tool(
       content: [
         {
           type: "text",
-          text: `URL soumise au crawl avec succes : ${url} (site: ${siteUrl})`,
+          text: `URL soumise au crawl avec succes : ${url} (site: ${siteUrl}) [quota: ${quota.used}/${GSC_DAILY_LIMIT}]`,
         },
       ],
     };
